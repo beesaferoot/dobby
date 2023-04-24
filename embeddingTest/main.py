@@ -3,27 +3,21 @@ import numpy as np
 import pandas as pd
 from utils import  clusterIssuesWithLabelInit, dict_to_list
 
-model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
-
-def getEmbeddings(sentences):
-    embeddings = model.encode(sentences)
-    return embeddings
-
 
 class IssueClusterer:
     label_embeddings = []
     
     def __init__(self, labels, model):
         self.model = SentenceTransformer(model)
-        self.label_embeddings = getEmbeddings(dict_to_list(labels["label_description"]))
+        self.label_embeddings = self.getEmbeddings(dict_to_list(labels["label_description"]))
 
 
-    def getEmbedding(self, sentences):
+    def getEmbeddings(self, sentences):
         return self.model.encode(sentences)
 
 
     def cluster(self, github_issues, threshold):
-        issue_embeddings = getEmbeddings(dict_to_list(github_issues["issue_title"]))
+        issue_embeddings = self.getEmbeddings(dict_to_list(github_issues["issue_title"]))
         clusters = clusterIssuesWithLabelInit(self.label_embeddings, issue_embeddings, threshold)
         tagged_issues = {"issue_id": {}, "label_id": {}, "label_tag": {}}
         for i in range(len(github_issues["id"])):
