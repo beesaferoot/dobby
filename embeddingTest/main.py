@@ -10,7 +10,31 @@ def getEmbeddings(sentences):
     return embeddings
 
 
+class IssueClusterer:
+    label_embeddings = []
+    
+    def __init__(self, labels, model):
+        self.model = SentenceTransformer(model)
+        self.label_embeddings = getEmbeddings(dict_to_list(labels["label_description"]))
 
+
+    def getEmbedding(self, sentences):
+        return self.model.encode(sentences)
+
+
+    def cluster(self, github_issues, threshold):
+        issue_embeddings = getEmbeddings(dict_to_list(github_issues["issue_title"]))
+        clusters = clusterIssuesWithLabelInit(self.label_embeddings, issue_embeddings, threshold)
+        tagged_issues = {"issue_id": {}, "label_id": {}, "label_tag": {}}
+        for i in range(len(github_issues["id"])):
+            tagged_issues["issue_id"][i] = github_issues["id"][i]
+            if not (clusters[i] is None):
+                tagged_issues["label_id"][i] = labels["id"][clusters[i]]
+                tagged_issues["label_tag"][i] = labels["label_tag"][clusters[i]]
+            else:
+                tagged_issues["label_id"][i] = None
+                tagged_issues["label_tag"][i] = None
+        return tagged_issues
 
 if __name__ == "__main__":
     labels = {
@@ -28,20 +52,8 @@ if __name__ == "__main__":
              1: "Serialize function returns null",
              2: "Add a deserialized function"},
     }
-
-    label_embeddings = getEmbeddings(dict_to_list(labels["label_description"]))
-    issue_embeddings = getEmbeddings(dict_to_list(github_issues["issue_title"]))
-
-    # return tagged_issues = {-{issue_id: {}, label_id: {}, label_tag: {}}-}
-
-    clusters = clusterIssuesWithLabelInit(label_embeddings, issue_embeddings, -1) # -1 implies no threshold
-
-    tagged_issues = {"issue_id": {}, "label_id": {}, "label_tag": {}}
+        
+    test_ = IssueClusterer(labels=labels, model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
 
 
-    for i in range(len(github_issues["id"])):
-        tagged_issues["issue_id"][i] = github_issues["id"][i]
-        tagged_issues["label_id"][i] = labels["id"][clusters[i]]
-        tagged_issues["label_tag"][i] = labels["label_tag"][clusters[i]]
-    
-    print(tagged_issues)
+    print(test_.cluster(github_issues=github_issues, threshold=-1))# -1 implies no threshold
