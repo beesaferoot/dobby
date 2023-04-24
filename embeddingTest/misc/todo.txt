@@ -1,0 +1,2 @@
+1. Create a fluent API for the individual of the clustering
+2. 
