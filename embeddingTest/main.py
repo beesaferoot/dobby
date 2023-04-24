@@ -11,6 +11,9 @@ class IssueClusterer:
         self.model = SentenceTransformer(model)
         self.label_embeddings = self.getEmbeddings(dict_to_list(labels["label_description"]))
 
+    def setNewLabelSet(self, labels):
+        self.label_embeddings = self.getEmbeddings(dict_to_list(labels["label_description"]))
+        pass
 
     def getEmbeddings(self, sentences):
         return self.model.encode(sentences)
