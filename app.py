@@ -1,10 +1,9 @@
+import enum
 import os
-import requests
 
 from dotenv import load_dotenv
 from flask import Flask, request
-from github import Github, GithubIntegration
-
+from github import Github, GithubIntegration, Issue, IssueComment, Repository
 
 load_dotenv()
 app = Flask(__name__)
@@ -24,22 +23,25 @@ git_integration = GithubIntegration(
 )
 
 
+class BotAction(enum.Enum):
+    translate = 1
+    auto_label = 2
+
+
 @app.route("/", methods=['POST'])
 def bot():
-    
-    # exit if not an issue event 
-    if not all(k in payload.keys() for k in ['action', 'issue']) and \
-            payload['action'] == 'opened':
-        return "ok"
-
     payload = request.json
+
+    if "comment" in payload.keys() and payload["action"] == "created":
+        bot_action = BotAction.translate
+    elif "issue" in payload.keys() and payload["action"] == "opened":
+        bot_action = BotAction.auto_label
+    else:
+        return "no_op"
+
     owner = payload['repository']['owner']['login']
     repo_name = payload['repository']['name']
-    issue_number = payload['issue']['number']
 
-    # Get a git connection as our bot
-    # Here is where we are getting the permission to talk as our bot and not
-    # as a Python webservice
     git_connection = Github(
         login_or_token=git_integration.get_access_token(
             git_integration.get_installation(owner, repo_name).id
@@ -47,9 +49,29 @@ def bot():
     )
     repo = git_connection.get_repo(f"{owner}/{repo_name}")
 
-    issue = repo.get_issue(number=1)
+    if bot_action == BotAction.auto_label:
+        issue_number = payload['issue']['number']
+        issue = repo.get_issue(number=issue_number)
+        auto_label(repo=repo, issue=issue)
+        return
+    if bot_action == BotAction.translate:
+        issue_number = payload['issue']['number']
+        comment_id = payload['comment']['id']
+        comment_body = payload['comment']['body']
+        if "@dobby" not in comment_body:
+            return
+        issue = repo.get_issue(number=issue_number)
+        comment = issue.get_comment(comment_id)
+        translate_issue_boby(repo, comment)
+        return
 
-    print(issue.body)
+
+def auto_label(repo: Repository, issue: Issue):
+    pass
+
+
+def translate_issue_boby(repo: Repository, comment: IssueComment):
+    pass
 
 
 if __name__ == "__main__":
