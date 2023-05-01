@@ -1,78 +1,84 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
+import db
 import json
-from utils import  (
-    clusterIssuesWithLabelInit, 
-    dict_to_list, 
-    add_the_labels_column, 
+from utils import (
+    clusterIssuesWithLabelInit,
+    dict_to_list,
+    add_the_labels_column,
     add_the_group_column,
     clusterIssuesInit,
     list_to_dict,
     NumpyArrayEncoder,
     preprocessSerializedJson,
     labelIssues
-    )
-
+)
 
 
 class IssueClusterer:
     label_embeddings = []
-    
-    def __init__(self, model):
+
+    def __init__(self, model, session: db.Session, repo_name: str):
         self.model = SentenceTransformer(model)
         # self.label_embeddings = self.getEmbeddings(dict_to_list(labels["label_description"]))
+        self.db_session = session
+        self.repo_name = repo_name
 
     def setNewLabelSet(self, labels):
         self.label_embeddings = self.getEmbeddings(dict_to_list(labels["label_description"]))
 
+    def getIssues(self):
+        # embedding_json = open("data/embeddings.json", "r")
+        # embedding_json_data = embedding_json.read()
+        # embedding_dict = json.loads(embedding_json_data)
+        # embedding_list = dict_to_list(embedding_dict["issue_embeddings"])
+        # return np.asarray(embedding_list)
+        return db.get_issue_by_repo(repo_name=self.repo_name)
 
-    def getEmbeddings(self):
-        embedding_json = open("data/embeddings.json", "r")
-        embedding_json_data = embedding_json.read()
-        embedding_dict = json.loads(embedding_json_data)
-        embedding_list = dict_to_list(embedding_dict["issue_embeddings"])
-        return np.asarray(embedding_list)  
-
+    def getEmbedding(self, issues):
+        embeddings = []
+        for issue in issues:
+            embedding = np.frombuffer(issue.embedding)
+            embeddings.append(embedding)
+        return embeddings
 
     def createEmbeddings(self, github_issues):
-        issue_embeddings = self.model.encode(dict_to_list(github_issues["issue_title"]))
-        github_issues["issue_embeddings"] = {}
-        for i in range(len(github_issues["id"])):
-            github_issues["issue_embeddings"][i] = issue_embeddings[i]
-        embeddings_json = open("data/embeddings.json", "w")
-        embeddings_json.write(json.dumps(github_issues, cls=NumpyArrayEncoder))
-        embeddings_json.close()
+        issue_embeddings = self.model.encode([f"{issue['title']}-\n{issue['body']}" for issue in github_issues])
+        for index, issue in enumerate(github_issues):
+            # issue -> {"id": "", "title": "", "body": ""}
+            db.create_new_issue(self.db_session, issue['id'],
+                                issue['tittle'], issue['body'],
+                                issue_embeddings[index])
 
-
-    #to-do Catch error if file is not create or file is empty
+    # to-do Catch error if file is not create or file is empty
     def insertNewEmbeddings(self, new_github_issues):
-        new_github_embeddings =\
+        new_github_embeddings = \
             self.model.encode(dict_to_list(new_github_issues["issue_title"]))
-        _github_issues =\
+        _github_issues = \
             preprocessSerializedJson("data/embeddings.json")
         current_size = len(_github_issues["id"])
-        
+
         for i in range(len(new_github_issues["id"])):
-            _github_issues["issue_embeddings"][current_size + i] =\
+            _github_issues["issue_embeddings"][current_size + i] = \
                 new_github_embeddings[i]
-            _github_issues["id"][current_size + i] =\
+            _github_issues["id"][current_size + i] = \
                 new_github_issues["id"][i]
-            _github_issues["issue_title"][current_size + i] =\
+            _github_issues["issue_title"][current_size + i] = \
                 new_github_issues["issue_title"][i]
         embeddings_json = open("data/embeddings.json", "w+")
         embeddings_json.write(json.dumps(_github_issues, cls=NumpyArrayEncoder))
         embeddings_json.close()
-           
 
     def cluster(self, threshold):
-        issue_embeddings = self.getEmbeddings()
+        issues = self.getIssues()
+        issue_embeddings = self.getEmbedding(issues)
         (clusters, _) = clusterIssuesInit(issue_embeddings, threshold)
-        grouped_issues = {"issue_id" : {}, "group_id" : {}}
+        grouped_issues = {"issue_id": {}, "group_id": {}}
         _github_issues = preprocessSerializedJson("data/embeddings.json")
         for i in range(len(_github_issues["id"])):
             grouped_issues["issue_id"][i] = _github_issues["id"][i]
-            if not(clusters[i] is None):
+            if not (clusters[i] is None):
                 grouped_issues["group_id"][i] = _github_issues["id"][clusters[i]]
             else:
                 grouped_issues["group_id"][i] = None
@@ -80,9 +86,8 @@ class IssueClusterer:
         cluster_json.write(json.dumps(grouped_issues))
         cluster_json.close()
 
-    
     def tagIssues(self, labels, threshold):
-        _label_embeddings =\
+        _label_embeddings = \
             self.model.encode(dict_to_list(labels["label_description"]))
         issue_embeddings = self.getEmbeddings()
         issueAndTags = labelIssues(_label_embeddings, issue_embeddings, threshold=threshold)
@@ -100,21 +105,19 @@ class IssueClusterer:
         cluster_json = open("data/tagged_issues.json", "w+")
         cluster_json.write(json.dumps(tagged_issues))
         cluster_json.close()
-        
 
 
 if __name__ == "__main__":
     labels = {
-        "id" : {0: 0, 1: 1, 2: 2},
-        "label_tag" : {0: "bug", 1: "enhancement", 2: "documentation"},
-        "label_description" : 
+        "id": {0: 0, 1: 1, 2: 2},
+        "label_tag": {0: "bug", 1: "enhancement", 2: "documentation"},
+        "label_description":
             {0: "Something isn't working", 1: "New feature or request", 2: "improvements or additions to documentation"}
     }
 
-
     github_issues = {
         "id": {0: 0, 1: 1, 2: 2},
-        "issue_title" : 
+        "issue_title":
             {0: "No description of the foo function in the documentation",
              1: "Serialze function returns null",
              2: "Add a deserialized function"},
@@ -122,13 +125,12 @@ if __name__ == "__main__":
 
     new_github_issues = {
         "id": {0: 3},
-        "issue_title" : 
+        "issue_title":
             {0: "No description of the foo function in the documentation"},
     }
-     
-        
+
     test_ = IssueClusterer(model='sentence-transformers/paraphrase-multilingual-mpnet-base-v2')
-    
+
     # creates the seed embeddings 
     # test_.createEmbeddings(github_issues=github_issues)
 
@@ -141,8 +143,3 @@ if __name__ == "__main__":
 
     # test_.cluster(threshold=0.5)
     # test_.tagIssues(labels, threshold=0.4)
-
-
-
-    
-
