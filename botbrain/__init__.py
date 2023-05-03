@@ -7,13 +7,12 @@ from cohere.responses.classify import Example
 
 # uses the input/examples.csv files as the example set
 class BotBrain:
-    cohere_obj : cohere.Client
-    examples : list
-    model : str
-    lang_supported : dict
+    cohere_obj: cohere.Client
+    examples: list
+    model: str
+    lang_supported: dict
 
-
-    def __init__(self, model:str):
+    def __init__(self, model: str):
         self.cohere_obj = cohere.Client(f"{API_KEY}")
         self.model = model
         self.examples = self._get_examples()
@@ -21,8 +20,7 @@ class BotBrain:
         lang_data = lang_file.read()
         lang_file.close()
         self.lang_supported = json.loads(lang_data)
-        # print(type(self.lang_supported))
-
+        self.confidence_threshold = .7
 
     def _get_examples(self):
         print("Debug")
@@ -31,13 +29,11 @@ class BotBrain:
         for i in range(len(data_dict["issue_title"])):
             result_.append(
                 Example(data_dict["issue_title"][i], data_dict["label"][i])
-            ) 
+            )
         return result_
 
-
-    def label_issues(self, github_issues_list:list):
+    def label_issues(self, github_issues_list: list):
         if len(self.examples) == 0:
-            # Throws an error if the example set is empty
             return None
         else:
             print(f"{github_issues_list}; {self.examples}; {self.model}")
@@ -52,8 +48,34 @@ class BotBrain:
                 result.append((github_issues_list[i], predicted_labels[i]))
             return result
 
+    def predict_label_from_issues(self, issue, issue_samples) -> str:
+        # issue -> issue_title+issue_body
+        # issue_samples -> [(issue_title + issue_body, label),...]
+        samples = [Example(content, label) for content, label in issue_samples]
+        response = self.cohere_obj.classify(
+            inputs=[issue],
+            examples=samples,
+            model=self.model
+        )
 
-    def translate_issue(self):
-        return {}
+        classifications = response.classifications
+        score = classifications[0]['confidence']
+        if score < self.confidence_threshold:
+            return ''
 
- 
+        return classifications[0]['prediction']
+
+    def translate_issue(self, issue_title, issue_body, lang: str) -> str:
+        if lang not in self.lang_supported:
+            return f"Sorry couldn't figure out how to translate to {lang.capitalize()}"
+
+        prompt = f"rewrite quoted text in {lang}: \"{issue_body}\""
+        response = self.cohere_obj.generate(prompt)
+        lang_detect = self.cohere_obj.detect_language([response.generations[0].text])
+        lang_in_cap = lang.capitalize()
+        if all(language.language_name == lang_in_cap for language in lang_detect.results):
+            return "\n".join(response.texts)
+
+        return f"Sorry couldn't figure out how to translate to {lang.capitalize()}"
+
+
