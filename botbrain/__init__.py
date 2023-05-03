@@ -70,7 +70,12 @@ class BotBrain:
             return f"Sorry couldn't figure out how to translate to {lang.capitalize()}"
 
         prompt = f"rewrite quoted text in {lang}: \"{issue_body}\""
-        response = self.cohere_obj.generate(prompt)
+        response = self.cohere_obj.generate(
+            model= self.model,
+            prompt=prompt,
+            max_tokens=450,
+            temperature=0.9
+        )
         lang_detect = self.cohere_obj.detect_language([response.generations[0].text])
         lang_in_cap = lang.capitalize()
         if all(language.language_name == lang_in_cap for language in lang_detect.results):
