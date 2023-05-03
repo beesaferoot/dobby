@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from flask import Flask, request
 from github import Github, GithubIntegration, Issue, IssueComment, Repository
+from botbrain import BotBrain
 
 load_dotenv()
 app = Flask(__name__)
@@ -11,7 +12,7 @@ app = Flask(__name__)
 app_id = os.getenv('APP_ID')
 # Read the bot certificate
 with open(
-        os.get_env('PATH_TO_CERT'),
+        os.getenv('PATH_TO_CERT'),
         'r'
 ) as cert_file:
     app_key = cert_file.read()
@@ -22,10 +23,18 @@ git_integration = GithubIntegration(
     app_key,
 )
 
+botbrain_obj = BotBrain('embed-multilingual-v2.0')
 
 class BotAction(enum.Enum):
     translate = 1
     auto_label = 2
+
+def indexify(data_tuple_list: list):
+    size_ = len(data_tuple_list)
+    result = []
+    for i in range(size_):
+        result[i] = data_tuple_list[i]
+    return result
 
 
 @app.route("/", methods=['POST'])
@@ -53,7 +62,14 @@ def bot():
         issue_number = payload['issue']['number']
         issue = repo.get_issue(number=issue_number)
         auto_label(repo=repo, issue=issue)
-        return
+        
+        # print(f"{issue.title}")
+        
+        output = indexify([(issue_number, issue.title)]) #give each issue index
+        result = botbrain_obj.label_issues([issue.title]) #returns a list of tuple of issue title with there labels
+        final_result = [(output[i][0], result[i][0], result[i][1]) for i in range(len(output))] #retunrs a list of tuple of issue number, title and predicted labels
+        print(final_result)
+        return 
     if bot_action == BotAction.translate:
         issue_number = payload['issue']['number']
         comment_id = payload['comment']['id']

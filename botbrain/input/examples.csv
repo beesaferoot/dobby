@@ -1,1 +1,12 @@
-issue_title,label
+label,issue_title
+bug,indexify function throws an error to the console
+bug,app.py does not run on my mac
+documentation,Documentation is incomplete
+documentation,The indexify isn't specified correctly in the documentation  
+duplicate,This issue or pull request already exists
+duplicate,This issues has been raised before
+enhancement,New feature or request
+enhancement,Add a new function to parse bot prompt
+good first issue,How do i install this project
+good first issue,What is a good new coding example using this repo
+
