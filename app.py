@@ -23,8 +23,6 @@ git_integration = GithubIntegration(
     app_key,
 )
 
-botbrain_obj = BotBrain('embed-multilingual-v2.0')
-
 
 class BotAction(enum.Enum):
     translate = 1
@@ -69,7 +67,7 @@ def bot():
         issue_number = payload['issue']['number']
         comment_id = payload['comment']['id']
         comment_body = payload['comment']['body']
-        if "@dobby" not in comment_body:
+        if "@dobby-gh-bot" not in comment_body:
             return "no_op"
         issue = repo.get_issue(number=issue_number)
         comment = issue.get_comment(comment_id)
@@ -80,19 +78,22 @@ def bot():
 def auto_label(repo: Repository, target_issue: Issue):
     # dumb approach to fetching issues
     issue_samples = []
+    issue_labels = []
     for i, issue in enumerate(repo.get_issues()):
         # only take 90 samples
         if i < 90:
             title, body, labels = issue.title, issue.body, issue.labels
             for label in labels:
-                issue_sample = (f"{title} : {body}", label)
+                issue_sample = (f"{title} : {body}", label.name)
                 issue_samples.append(issue_sample)
+                issue_labels.append(label.name)
         else:
             break
 
     bot_brain = BotBrain('embed-multilingual-v2.0')
     predict_label = bot_brain.predict_label_from_issues(issue=f"{target_issue.title} : {target_issue.body}",
-                                                        issue_samples=issue_samples)
+                                                        issue_samples=issue_samples,
+                                                        issue_labels=issue_labels)
     if predict_label:
         # auto label issue
         target_issue.set_labels([predict_label])
@@ -110,7 +111,7 @@ def translate_issue_boby(repo: Repository, comment: IssueComment, issue: Issue):
 
 def parse_translate_command_langauge(comment_text: str) -> str:
     import re
-    match = re.search("@dobby translate to [\w]+", comment_text)
+    match = re.search("@dobby-gh-bot translate to [\w]+", comment_text)
     words = match.group().split("to ")
     if len(words) < 2:
         return ""
