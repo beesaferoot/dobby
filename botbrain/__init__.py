@@ -1,7 +1,6 @@
 import cohere
 import json
 import pandas as pd
-from botbrain.utils import API_KEY
 from cohere.responses.classify import Example
 from collections import Counter
 
@@ -13,8 +12,8 @@ class BotBrain:
     model: str
     lang_supported: dict
 
-    def __init__(self, model: str):
-        self.cohere_obj = cohere.Client(f"{API_KEY}")
+    def __init__(self, model: str, api_key=""):
+        self.cohere_obj = cohere.Client(api_key)
         self.model = model
         lang_file = open("botbrain/data/supportedlang.json")
         lang_data = lang_file.read()

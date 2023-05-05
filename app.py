@@ -10,6 +10,8 @@ load_dotenv()
 app = Flask(__name__)
 # app id
 app_id = os.getenv('APP_ID')
+bot_model_api_key = os.getenv('API_KEY')
+
 # Read the bot certificate
 with open(
         os.getenv('PATH_TO_CERT'),
@@ -90,7 +92,7 @@ def auto_label(repo: Repository, target_issue: Issue):
         else:
             break
 
-    bot_brain = BotBrain('embed-multilingual-v2.0')
+    bot_brain = BotBrain('embed-multilingual-v2.0', api_key=bot_model_api_key)
     predict_label = bot_brain.predict_label_from_issues(issue=f"{target_issue.title} : {target_issue.body}",
                                                         issue_samples=issue_samples,
                                                         issue_labels=issue_labels)
@@ -102,7 +104,7 @@ def auto_label(repo: Repository, target_issue: Issue):
 def translate_issue_boby(repo: Repository, comment: IssueComment, issue: Issue):
     lang = parse_translate_command_langauge(comment.body)
     if lang:
-        bot_brain = BotBrain('command-xlarge-nightly')
+        bot_brain = BotBrain('command-xlarge-nightly', api_key=bot_model_api_key)
         translate_text = bot_brain.translate_issue(issue.title, issue.body, lang)
         if translate_text:
             comment.edit(f"{comment.body}\n\n*ISSUE TRANSLATION*\n\n{translate_text}")
