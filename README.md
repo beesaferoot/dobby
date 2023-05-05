@@ -13,10 +13,10 @@ Before installing and using Dobby, make sure you have the following:
 
 You can install the required dependencies by running the following commands:
 
-bashCopy code
 
-`pip install -r requirements.txt
-npm install --global smee-client` 
+- `pip install -r requirements.txt`
+
+- `npm install --global smee-client` 
 
 ## Installation
 
