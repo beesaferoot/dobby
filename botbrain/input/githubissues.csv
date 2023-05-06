@@ -1,1 +1,30 @@
-id,issue_url,issue_title,body
+id,issue_title,issue_body,issue_label
+1,"Probleme beim Importieren von Daten in Excel", "Ich versuche, eine CSV-Datei in Excel zu importieren, aber es scheint ein Problem mit der Codierung zu geben. Ich bekomme nur seltsame Zeichen anstelle der Umlaute. Kann mir jemand helfen?", bug
+2,"Problème d'affichage sur la page de connexion", "Je ne peux pas me connecter à mon compte car il y a un problème avec l'affichage de la page de connexion. Tout le reste fonctionne correctement. Pouvez-vous m'aider, s'il vous plaît?", bug
+3,"Fehler bei der Verwendung von TensorFlow auf einem Windows-PC", "Ich versuche, TensorFlow auf meinem Windows-PC zu verwenden, aber ich bekomme immer einen Fehler beim Importieren von TensorFlow. Ich habe versucht, TensorFlow mit pip zu installieren, aber das hat nicht funktioniert. Hat jemand eine Lösung?", bug
+4,"Problema al instalar paquete en R", "Intenté instalar un paquete en R, pero me da un error y no sé cómo solucionarlo. ¿Alguien puede ayudarme, por favor?", bug
+5,"Problemi con la connessione al database MySQL", "Non riesco a connettermi al mio database MySQL. Ho verificato le credenziali di accesso e sembrano corrette, ma ricevo comunque un errore di connessione. Qualcuno ha qualche idea su come risolvere questo problema?", bug
+6,"Problème de performance sur mon ordinateur", "Mon ordinateur est lent et je ne sais pas pourquoi. J'ai déjà essayé de nettoyer mon disque dur et de désinstaller les programmes inutiles, mais cela n'a pas résolu le problème. Est-ce que quelqu'un a une idée de ce qui pourrait causer ce problème?", performance
+7,"Problema con la configuración de mi correo electrónico", "No puedo configurar mi correo electrónico en mi cliente de correo. He revisado las credenciales y la configuración varias veces y todo parece correcto, pero no puedo recibir ni enviar correos electrónicos. ¿Alguien puede ayudarme, por favor?", bug
+8,"Fehler beim Hochladen von Bildern auf meiner Website", "Ich versuche, Bilder auf meiner Website hochzuladen, aber es funktioniert nicht. Ich bekomme immer einen Fehler beim Hochladen der Bilder. Ich habe bereits versucht, die Größe der Bilder zu verkleinern, aber das hat nichts gebracht. Hat jemand eine Lösung?", bug
+9,"Problème de sécurité sur mon site web", "J'ai remarqué une activité suspecte sur mon site web et je pense qu'il y a un problème de sécurité. Comment puis-je vérifier cela et comment puis-je résoudre le problème?", security
+10,"Probleme beim Drucken auf meinem HP-Drucker", "Mein HP-Drucker funktioniert nicht richtig und ich kann nicht drucken. Ich habe bereits versucht, den Drucker neu zu installieren, aber das hat nicht geholfen. Gibt es noch andere Lösungen, die ich ausprobieren kann?", bug
+11,"Probleme beim Laden der Webseite","Die Webseite lädt nicht vollständig und einige Elemente fehlen.",bug
+12,"Impossibile accedere all'applicazione","Non riesco ad accedere all'applicazione dopo l'ultimo aggiornamento.",bug
+13,"Nueva funcionalidad para la aplicación móvil","Agregue la posibilidad de cambiar el tamaño de la fuente en la aplicación móvil.",enhancement
+14,"Problème de connexion au serveur","Je n'arrive pas à me connecter au serveur, le message d'erreur est ""connection refused"".",bug
+15,"Atualizar documentação de API","A documentação da API está desatualizada, por favor atualize com as informações mais recentes.",documentation
+16,"ページが表示されない","ページが完全に読み込まれず、いくつかの要素が欠落しています。",bug
+17,"Ajouter une fonctionnalité pour trier les éléments","Ajouter la possibilité de trier les éléments par ordre alphabétique ou numérique.",enhancement
+18,"Problema con el formato de fecha","El formato de fecha en la aplicación web es incorrecto y no se puede cambiar.",bug
+19,"Agregar una página de soporte","Agregue una página de soporte para ayudar a los usuarios con problemas comunes.",enhancement
+20,"Impossibile inviare un messaggio di posta elettronica","Non riesco a inviare un messaggio di posta elettronica, il messaggio di errore è ""server non trovato"".",bug
+21,"Problème d'affichage des images","Les images ne s'affichent pas correctement sur la page web.",bug
+22,"Nueva función de chat en vivo","Agregue una función de chat en vivo para que los usuarios puedan comunicarse con el equipo de soporte.",enhancement
+23,"Problème de saisie de données","Je ne peux pas saisir les données dans le formulaire, les champs sont verrouillés.",bug
+24,"Página de inicio lenta","La página de inicio tarda mucho en cargar, por favor optimízala.",performance
+25,"Aggiungere una funzionalità di ricerca avanzata","Aggiungere una funzionalità di ricerca avanzata per consentire agli utenti di trovare informazioni specifiche più facilmente.",enhancement
+26,"Problème d'authentification avec Google","Je ne peux pas m'authentifier avec Google, le message d'erreur est ""Token invalide"".",bug
+27,"Errore di sintassi nel codice","Ho ricevuto un errore di sintassi nel mio codice e non riesco a capire dove sia l'errore.",bug
+28,"Actualizar la página de inicio","La página de inicio necesita una actualización, por favor actualice con información relevante y actualizada.",enhancement
+29,"Errore di caricamento del video","Il video non si carica correttamente sulla pagina web, il messaggio di errore è ""video non disponibile"".",bug

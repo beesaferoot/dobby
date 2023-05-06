@@ -61,6 +61,15 @@ Dobby can automatically label issues based on the content of the issue using the
 
 To translate an issue, mention Dobby in a comment with the query `@dobby-gh-bot translate to <target-language>`, where `<target-language>` is the target language to be translated to. Dobby will automatically translate the issue into the specified language and post a comment with the translated text. This functionality uses the Cohere's generator model `command-xlarge-nightly`.
 
+## Future Works and Considerations
+
+As we continue to improve our issue labeling bot, there are a few areas we want to focus on:
+
+-   **Subsampling of examples:** To optimize our labeling process, we want to be able to subsample already labeled issues.
+    
+-   **Support for multiple-labeling:** Being able to apply multiple labels to an issue will help us get a more nuanced understanding of each issue.
+    
+-   **Platform-agnostic integration:** We want to be able to run our bot on any platform, such as Slack or Discord, to make it as widely accessible as possible.
 ## Contributing
 
 If you would like to contribute to this project, please open an issue or submit a pull request. All contributions are welcome!
