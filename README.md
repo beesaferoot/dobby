@@ -55,12 +55,12 @@ Dobby offers two main functionalities: automated labeling and translation.
 
 ### Automated Labeling
 
-Dobby can automatically label issues based on the content of the issue using the Cohere's embed model `embed-multilingual-v2.0` model.
+Dobby can automatically label issues based on the content of the issue using the Cohere's embed model [`embed-multilingual-v2.0`](https://docs.cohere.com/docs/multilingual-language-models) model.
 
 ### Translation
 
-To translate an issue, mention Dobby in a comment with the query `@dobby-gh-bot translate to <target-language>`, where `<target-language>` is the target language to be translated to. Dobby will automatically translate the issue into the specified language and post a comment with the translated text. This functionality uses the Cohere's generator model `command-xlarge-nightly`.
+To translate an issue, mention Dobby in a comment with the query `@dobby-gh-bot translate to <target-language>`, where `<target-language>` is the target language to be translated to. Dobby will automatically translate the issue into the specified language and post a comment with the translated text. This functionality uses the Cohere's generator model [`command-xlarge-nightly`](https://docs.cohere.com/docs/command-beta).
 
 ## Contributing
 
-If you would like to contribute to this project, please open an issue or submit a pull request. All contributions are welcome!
+If you would like to contribute to this project, please open an issue 🌚 or submit a pull request. All contributions are welcome!
