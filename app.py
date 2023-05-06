@@ -98,7 +98,7 @@ def auto_label(repo: Repository, target_issue: Issue):
                                                         issue_labels=issue_labels)
     if predict_label:
         # auto label issue
-        target_issue.set_labels([predict_label])
+        target_issue.set_labels(predict_label)
 
 
 def translate_issue_boby(repo: Repository, comment: IssueComment, issue: Issue):
