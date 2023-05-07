@@ -96,7 +96,6 @@ def auto_label(repo: Repository, target_issue: Issue):
     predict_label = bot_brain.predict_label_from_issues(issue=f"{target_issue.title} : {target_issue.body}",
                                                         issue_samples=issue_samples,
                                                         issue_labels=issue_labels)
-    print(f"prediction: {predict_label}")
     if predict_label:
         # auto label issue
         target_issue.set_labels(predict_label)

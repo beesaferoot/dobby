@@ -63,8 +63,10 @@ class BotBrain:
             classifications = response.classifications
             score = classifications[0].confidence
             print(f"score: {score}")
-            if score < self.confidence_threshold:
-                return ''
+            print(f"prediction: {classifications[0].prediction}")
+            # Hack to allow demo
+            # if score < self.confidence_threshold:
+            #     return ''
 
             return classifications[0].prediction
         except Exception as exc:
