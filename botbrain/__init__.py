@@ -62,7 +62,7 @@ class BotBrain:
 
             classifications = response.classifications
             score = classifications[0].confidence
-            print(f"{score=}")
+            print(f"score: {score}")
             if score < self.confidence_threshold:
                 return ''
 
